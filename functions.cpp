@@ -13,7 +13,7 @@ void byPointer(int*);
 // overloaded functions
 
 void myPrint_overloaded(char);
-void myPrint_overloaded(std::string);
+void myPrint_overloaded(const std::string&);
 void myPrint_overloaded(int);
 // then we implement function definitions and call each one.
 
@@ -81,6 +81,14 @@ int main () {
     myPrint_overloaded("tarokh is a moderate programmer");      // calling string overload
     myPrint_overloaded(657);    // calling integer overload
 
+    {
+        // this is the block scope, val, is a different variable here
+        int val = 234;
+        std::cout << "the value of val is ----->>>> " << val << std::endl;
+    }
+    std::cout << "the value of val after the block is ----->>>> " << val << std::endl;
+
+    return 0;
 }
 
 void func() {
