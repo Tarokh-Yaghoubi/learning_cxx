@@ -161,10 +161,79 @@ void MemberInitializationClass::prnXY() {
 }
 
 
+// When we initialize an object with another object of the same class, we invoke a copy constructor.
+// If we do not supply our copy constructor, The compiler generates a default copy constructor that performs
+// the so-called shallow copy.
+
+class CopyConstructorClass
+{
+private:
+    int x, y;
+public:
+    CopyConstructorClass(int xx, int yy) : x{xx}, y{yy}
+    { }
+
+    void prnPrintXXYY();
+};
+
+void CopyConstructorClass::prnPrintXXYY() {
+    std::cout << x << " " << y << std::endl;
+}
+
+// We can provide our own copy constructor.
+// The copy constructor has a special parameter signature of MyClass(const MyClass& rhs)
+
+class UserDefinedCopyConstructor
+{
+private:
+    int x, y;
+
+public:
+    UserDefinedCopyConstructor(int xx, int yy) : x{ xx }, y { yy }
+    { }
+
+    // User defined copy constructor
+
+    UserDefinedCopyConstructor(const UserDefinedCopyConstructor& rhs) : x{rhs.x}, y{rhs.y}  // Initialize members with other object's members
+    {
+        std::cout << "User defined copy constructor invoked " << x << " " << y << std::endl;
+    }
+};
+
+// Please note that the default copy constructor does not correctly copy members of some types, such as pointers, arrays, etc.
+// In order to properly make copies, we need to define our own copy logic inside the copy constructor. This is referred to as 'deep copy'.
+// For pointers, for example, we need both to create a pointer and assign a value to the object it points to int our user-defined copy constructor.
+
+class DeepCopyClass
+{
+private:
+    int x;
+    int* ptr;
+
+public:
+
+    DeepCopyClass(int xx, int pp) : x{xx}, ptr{ new int(pp) }
+    { }
+
+    DeepCopyClass(const DeepCopyClass& rhs) : x{rhs.x}, ptr{ new int {*rhs.ptr }}
+    {
+        std::cout << "values of x and ptr is --------->>>>>>> " << x << " " << *ptr << std::endl;
+
+    }
+
+    void printXandPtr();
+};
+
+void DeepCopyClass::printXandPtr() {
+    std::cout << "values of x and ptr is --------->>>>>>> " << x << " " << *ptr << std::endl;
+}
+
 int main() {
 
     int x, y;
     x = y = 0;
+
+    int* ptr = &x;
 
     PublicAccessClass pacObj;
     pacObj.x = 87;
@@ -186,6 +255,19 @@ int main() {
 
     MemberInitializationClass memInitializationObj{x, y};
     memInitializationObj.prnXY();
+
+    CopyConstructorClass copyConstObj{x, y};
+    CopyConstructorClass copyConstObj1{copyConstObj};
+    copyConstObj1.prnPrintXXYY();
+
+    std::cout << std::endl << "-------------------------------" << std::endl;
+
+    UserDefinedCopyConstructor o{ 1, 5 };
+    UserDefinedCopyConstructor o2 = o;  // user defined copy constructor invoked
+
+    DeepCopyClass deepCopy{56, 65};
+    DeepCopyClass deepCopy2 = deepCopy;     // user defined copied constructor invoked
+    deepCopy2.printXandPtr();
 
 }
 
